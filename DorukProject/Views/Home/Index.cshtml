@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Doruk Project";
+}
+
+<body>
+    <div class="text-center">
+        <h1 class="display-4">Makine Raporum</h1>
+    </div>
+    <div class="container">
+        <table class="mt-5 table table-striped table-bordered" id="machineReportTable">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var column1;
+
+        $(document).ready(function() {
+            $.get("Home/GetTableColumns", function(column) {
+                column1 = column;
+                console.log(column1)
+                var tableColumn = "";
+                tableColumn += `<tr><td>İş Emri</td>`;
+                column.forEach(function(item) {
+                    tableColumn += `<td>${item}</td>`;
+                });
+                tableColumn += `<td>Total</td></tr>`;
+                $("#machineReportTable thead").html(tableColumn);
+                GetReport()
+            });
+
+
+        });
+        function GetReport() {
+            $.get("Home/GetReport", function(data) {
+                var tableContent = "";
+
+                data.forEach(function(item) {
+                    tableContent += `<tr><td>${item.workOrderID}</td>`;
+
+                    column1.forEach(r => {
+                        var satir = item.reasons.filter(x => x.name == r).length == 0 ? 0 : item.reasons.filter(x => x.name == r)[0].time;
+                        tableContent += `<td>${satir}</td>`;
+                    });
+
+                    tableContent += `<td>${item.total}</td></tr>`;
+                });
+
+                $("#machineReportTable tbody").html(tableContent);
+            });
+        }
+    </script>
+</body>
